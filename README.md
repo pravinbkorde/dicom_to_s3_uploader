@@ -30,7 +30,7 @@ A Django-based DICOM file management system with AWS S3 integration for medical 
    ```
 4. Run the development server:
    ```
-   python manage.py runserver 0.0.0.0:5000
+   python manage.py runserver
    ```
 
 ## Usage
