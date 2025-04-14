@@ -25,6 +25,7 @@ A Django-based DICOM file management system with AWS S3 integration for medical 
    ```
 3. Apply migrations:
    ```
+   python manage.py makemigrations
    python manage.py migrate
    ```
 4. Run the development server:
