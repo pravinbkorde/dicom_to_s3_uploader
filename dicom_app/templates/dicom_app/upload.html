@@ -1,0 +1,185 @@
+{% extends 'dicom_app/base.html' %}
+
+{% block title %}Upload DICOM Files{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-drop-zone {
+        border: 2px dashed #ccc;
+        border-radius: 5px;
+        padding: 50px;
+        text-align: center;
+        transition: border 0.3s ease-in-out;
+    }
+    .upload-drop-zone.drag-over {
+        border-color: #007bff;
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    #file-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>Upload DICOM Files</h1>
+        <p class="lead">Upload DICOM files to store in AWS S3</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">DICOM File Upload</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="upload-form">
+                    {% csrf_token %}
+                    
+                    <div class="upload-drop-zone mb-3" id="drop-zone">
+                        <div class="mb-3">
+                            <i class="fas fa-file-medical fa-3x text-primary mb-3"></i>
+                            <h4>Drag and drop DICOM files here</h4>
+                            <p>or</p>
+                            <div class="input-group">
+                                {{ form.dicom_file }}
+                                <label class="input-group-text" for="{{ form.dicom_file.id_for_label }}">Browse</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="file-list-container" class="mb-3" style="display: none;">
+                        <h5>Selected Files:</h5>
+                        <ul id="file-list" class="list-group"></ul>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary" id="upload-button">
+                            <i class="fas fa-upload me-2"></i>Upload DICOM Files
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card-footer bg-light">
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> Files will be processed to extract DICOM metadata and uploaded to AWS S3.
+                    Make sure both DICOM and AWS configurations are set up before uploading.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('id_dicom_file');
+        // Add multiple attribute to the file input - this bypasses Django's restrictions
+        fileInput.setAttribute('multiple', 'multiple');
+        const fileList = document.getElementById('file-list');
+        const fileListContainer = document.getElementById('file-list-container');
+        const uploadForm = document.getElementById('upload-form');
+        const uploadButton = document.getElementById('upload-button');
+        
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropZone.classList.add('drag-over');
+        }
+        
+        function unhighlight() {
+            dropZone.classList.remove('drag-over');
+        }
+        
+        // Handle dropped files
+        dropZone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            fileInput.files = files;
+            updateFileList();
+        }
+        
+        // Update file list when files are selected via the input
+        fileInput.addEventListener('change', updateFileList);
+        
+        function updateFileList() {
+            const files = fileInput.files;
+            
+            if (files.length > 0) {
+                fileListContainer.style.display = 'block';
+                fileList.innerHTML = '';
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const item = document.createElement('li');
+                    item.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    
+                    const fileIcon = document.createElement('i');
+                    fileIcon.className = 'fas fa-file-medical me-2 text-primary';
+                    
+                    const fileName = document.createElement('span');
+                    fileName.textContent = file.name;
+                    
+                    const fileSize = document.createElement('span');
+                    fileSize.className = 'badge bg-secondary';
+                    fileSize.textContent = formatFileSize(file.size);
+                    
+                    item.appendChild(fileIcon);
+                    item.appendChild(fileName);
+                    item.appendChild(fileSize);
+                    fileList.appendChild(item);
+                }
+                
+                uploadButton.disabled = false;
+            } else {
+                fileListContainer.style.display = 'none';
+                uploadButton.disabled = true;
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Submit form
+        uploadForm.addEventListener('submit', function() {
+            uploadButton.disabled = true;
+            uploadButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Uploading...';
+        });
+    });
+</script>
+{% endblock %}

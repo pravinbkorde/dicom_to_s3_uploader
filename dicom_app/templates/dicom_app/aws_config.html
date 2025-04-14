@@ -1,0 +1,80 @@
+{% extends 'dicom_app/base.html' %}
+
+{% block title %}AWS S3 Configuration{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>AWS S3 Configuration</h1>
+        <p class="lead">Configure AWS S3 settings for DICOM file storage</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">AWS S3 Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'dicom_app:update_aws_config' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.access_key.id_for_label }}" class="form-label">
+                            <i class="fas fa-key me-2"></i>Access Key
+                        </label>
+                        {{ form.access_key }}
+                        {% if form.access_key.errors %}
+                            <div class="text-danger">
+                                {{ form.access_key.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Your AWS Access Key ID</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.secret_key.id_for_label }}" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Secret Key
+                        </label>
+                        {{ form.secret_key }}
+                        {% if form.secret_key.errors %}
+                            <div class="text-danger">
+                                {{ form.secret_key.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Your AWS Secret Access Key</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.bucket_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-database me-2"></i>Bucket Name
+                        </label>
+                        {{ form.bucket_name }}
+                        {% if form.bucket_name.errors %}
+                            <div class="text-danger">
+                                {{ form.bucket_name.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">S3 bucket name for storing DICOM files</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update AWS Configuration
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card-footer bg-light">
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Important:</strong> AWS credentials are stored securely in the database. 
+                    Make sure you have the necessary permissions to list and upload objects to the specified bucket.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

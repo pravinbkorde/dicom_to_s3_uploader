@@ -1,0 +1,59 @@
+{% extends 'dicom_app/base.html' %}
+
+{% block title %}DICOM Configuration{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>DICOM Configuration</h1>
+        <p class="lead">Configure DICOM AE Title and Port Number settings</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">DICOM Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'dicom_app:update_dicom_config' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.ae_title.id_for_label }}" class="form-label">
+                            <i class="fas fa-tag me-2"></i>AE Title
+                        </label>
+                        {{ form.ae_title }}
+                        {% if form.ae_title.errors %}
+                            <div class="text-danger">
+                                {{ form.ae_title.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Application Entity Title for DICOM communication</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.port_number.id_for_label }}" class="form-label">
+                            <i class="fas fa-network-wired me-2"></i>Port Number
+                        </label>
+                        {{ form.port_number }}
+                        {% if form.port_number.errors %}
+                            <div class="text-danger">
+                                {{ form.port_number.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">Network port for DICOM service (1-65535)</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update DICOM Configuration
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

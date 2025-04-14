@@ -1,0 +1,70 @@
+{% extends 'dicom_app/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h1 class="mb-4">Welcome to DICOM Manager</h1>
+        <p class="lead">A system for managing DICOM files with AWS S3 integration</p>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="display-1 text-primary mb-3">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3 class="card-title">DICOM Configuration</h3>
+                <p class="card-text">Configure your DICOM settings including AE Title and Port Number.</p>
+                <a href="{% url 'dicom_app:dicom_config' %}" class="btn btn-primary">Configure DICOM</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="display-1 text-primary mb-3">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <h3 class="card-title">AWS S3 Configuration</h3>
+                <p class="card-text">Set up your AWS S3 credentials and select a bucket for storage.</p>
+                <a href="{% url 'dicom_app:aws_config' %}" class="btn btn-primary">Configure AWS S3</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="display-1 text-primary mb-3">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h3 class="card-title">Upload DICOM Files</h3>
+                <p class="card-text">Upload your DICOM files for storage and management in AWS S3.</p>
+                <a href="{% url 'dicom_app:upload_dicom' %}" class="btn btn-primary">Upload Files</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h4>Getting Started</h4>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Start by configuring your <a href="{% url 'dicom_app:dicom_config' %}">DICOM settings</a> (AE Title and Port Number).</li>
+                    <li>Next, set up your <a href="{% url 'dicom_app:aws_config' %}">AWS S3 configuration</a> with your Access Key, Secret Key, and Bucket Name.</li>
+                    <li>Finally, <a href="{% url 'dicom_app:upload_dicom' %}">upload your DICOM files</a> to store them in AWS S3.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
